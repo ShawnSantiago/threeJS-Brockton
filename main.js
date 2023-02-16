@@ -58,7 +58,7 @@ function init() {
 
   loader.load(
     // resource URL
-    "Brockton1.gltf",
+    "./Brockton1.gltf",
     // called when the resource is loaded
     function (gltf) {
       const root = gltf.scene;
