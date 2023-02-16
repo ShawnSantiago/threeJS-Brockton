@@ -12,6 +12,7 @@
     "vite": "^4.1.0"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^18.6.4",
     "obj2gltf": "^3.1.6",
     "three": "^0.149.0"
   }

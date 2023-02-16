@@ -16,6 +16,31 @@ let camera, controls, scene, renderer, clock, mixer;
 init();
 animate();
 
+// NOTE: Helper function
+function INT2RGB(int) {
+  return [(int & 0xff0000) >>> 16, (int & 0xff00) >>> 8, int & 0xff];
+}
+
+// NOTE: Helper function
+function RGB2INT(rgb) {
+  return (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
+}
+
+function transitionColor(percent, startColor, endColor) {
+  if (percent < 0) {
+    return startColor;
+  } else if (percent > 100) {
+    return endColor;
+  }
+  var pos = percent / 100;
+  var rgb1 = INT2RGB(startColor);
+  var rgb2 = INT2RGB(endColor);
+  var r = Math.trunc((1 - pos) * rgb1[0] + pos * rgb2[0] + 0.5);
+  var g = Math.trunc((1 - pos) * rgb1[1] + pos * rgb2[1] + 0.5);
+  var b = Math.trunc((1 - pos) * rgb1[2] + pos * rgb2[2] + 0.5);
+  return RGB2INT([r, g, b]);
+}
+
 function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera();
@@ -58,7 +83,7 @@ function init() {
 
   loader.load(
     // resource URL
-    "./Brockton1.gltf",
+    "./BrocktonMK2.gltf",
     // called when the resource is loaded
     function (gltf) {
       const root = gltf.scene;
@@ -68,20 +93,29 @@ function init() {
       let sceneChildren = scene.children[0].children;
       for (const key in sceneChildren) {
         if (Object.hasOwnProperty.call(sceneChildren, key)) {
-          const element = sceneChildren[key];
-          let Brockton;
-          console.log(element);
-          if (element.name === "Empty") {
-            Brockton = element;
+          const sceneChild = sceneChildren[key];
+          console.log(sceneChild);
+          if (sceneChild.name === "Brockton_MK2_v4") {
+            function findEnd()
+            // const sceneChildChildren = sceneChild.children;
+            // for (const key in sceneChildChildren) {
+            //   const child = sceneChildChildren[key];
+
+            //   if (Object.hasOwnProperty.call(sceneChildChildren, key)) {
+            //     console.log(child);
+            //     //sceneChild.material.color = new THREE.Color(0xffdd82);
+            //   }
+            // }
+
             // console.log(Brockton);
           }
-          if (element.type === "SpotLight") {
-            element.intensity = 10;
+          if (sceneChild.type === "DirectionalLight") {
+            sceneChild.intensity = 2000;
             // console.log(element);
             // element.target = Brockton;
           }
-          if (element.type === "PointLight") {
-            element.intensity = 10;
+          if (sceneChild.type === "PointLight") {
+            sceneChild.intensity = 200;
             // element.target = Brockton;
           }
         }
@@ -104,10 +138,8 @@ function init() {
       console.log("An error happened");
     }
   );
-
   window.addEventListener("resize", onWindowResize, false);
 }
-
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -117,7 +149,6 @@ function onWindowResize() {
 
 function animate() {
   requestAnimationFrame(animate);
-
   var delta = clock.getDelta();
 
   if (mixer) mixer.update(delta);
