@@ -65,7 +65,7 @@ function init() {
 
   camera.position.set(2, 2, 2);
 
-  new RGBELoader().load("./public/bridge.hdr", async (texture) => {
+  new RGBELoader().load("bridge.hdr", async (texture) => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
 
     // scene.background = texture;
