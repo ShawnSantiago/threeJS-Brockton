@@ -1,6 +1,6 @@
 import rendererUtils from "./renderer";
 import cameraUtils from "./camera";
-import controlsUtils from "./controls";
+import controlsUtils from "./cameraControls";
 import groundUtil from "./ground";
 import createLight from "./lights";
 import createFont from "./text";

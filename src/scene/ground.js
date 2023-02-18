@@ -6,7 +6,7 @@ const groundUtil = new Mesh(
 );
 groundUtil.name = "ground";
 groundUtil.position.y = -0.1;
-groundUtil.rotation.x = -Math.PI / 2;
+// groundUtil.rotation.x = -Math.PI / 2;
 groundUtil.receiveShadow = true;
 
 export default groundUtil;
