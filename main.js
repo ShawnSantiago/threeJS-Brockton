@@ -62,7 +62,7 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  camera.position.set(250, 20, 20);
+  camera.position.set(250, 250, 200);
 
   new RGBELoader().load("san_giuseppe_bridge_2k.hdr", async (texture) => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -91,7 +91,7 @@ function init() {
   controls.maxPolarAngle = angleRadians;
 
   controls.minDistance = 155;
-  controls.maxDistance = 255;
+  controls.maxDistance = 555;
 
   controls.maxPolarAngle = Math.PI / 2;
 
