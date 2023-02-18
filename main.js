@@ -191,12 +191,12 @@ function init() {
       //   }
       // }
 
-      // mixer = new THREE.AnimationMixer(gltf.scene);
+      mixer = new THREE.AnimationMixer(gltf.scene);
 
-      // // camera.copy(gltf.cameras[0]);
-      // gltf.animations.forEach((clip) => {
-      //   mixer.clipAction(clip).play();
-      // });
+      // camera.copy(gltf.cameras[0]);
+      gltf.animations.forEach((clip) => {
+        mixer.clipAction(clip).play();
+      });
       console.log(scene);
     },
     // called while loading is progressing
