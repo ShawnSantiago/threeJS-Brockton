@@ -30,8 +30,7 @@ init();
 animate();
 async function getMaterialX() {
   return await new MaterialXLoader()
-    .setPath(SAMPLE_PATH)
-    .loadAsync("standard_surface_gold.mtlx")
+    .loadAsync("brass.mtlx")
     .then(({ materials }) => Object.values(materials).pop());
 }
 
