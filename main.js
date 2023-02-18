@@ -1,6 +1,10 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { MaterialXLoader } from "three/examples/jsm/loaders/MaterialXLoader";
+import { nodeFrame } from "three/examples/jsm/renderers/webgl/nodes/WebGLNodes.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+import * as Node from "three/examples/jsm/nodes/Nodes";
 // Instantiate a loader
 const loader = new GLTFLoader();
 
@@ -10,52 +14,62 @@ const loader = new GLTFLoader();
 // loader.setDRACOLoader( dracoLoader );
 
 // Load a glTF resource
-
-let camera, controls, scene, renderer, clock, mixer;
-
+const SAMPLE_PATH =
+  "https://raw.githubusercontent.com/materialx/MaterialX/main/resources/Materials/Examples/StandardSurface/";
+let camera,
+  controls,
+  scene,
+  renderer,
+  clock,
+  mixer,
+  lights = [],
+  ground;
+const uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.standard.uniforms);
+//const frame = new Node.NodeFrame();
 init();
 animate();
-
-// NOTE: Helper function
-function INT2RGB(int) {
-  return [(int & 0xff0000) >>> 16, (int & 0xff00) >>> 8, int & 0xff];
-}
-
-// NOTE: Helper function
-function RGB2INT(rgb) {
-  return (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
-}
-
-function transitionColor(percent, startColor, endColor) {
-  if (percent < 0) {
-    return startColor;
-  } else if (percent > 100) {
-    return endColor;
-  }
-  var pos = percent / 100;
-  var rgb1 = INT2RGB(startColor);
-  var rgb2 = INT2RGB(endColor);
-  var r = Math.trunc((1 - pos) * rgb1[0] + pos * rgb2[0] + 0.5);
-  var g = Math.trunc((1 - pos) * rgb1[1] + pos * rgb2[1] + 0.5);
-  var b = Math.trunc((1 - pos) * rgb1[2] + pos * rgb2[2] + 0.5);
-  return RGB2INT([r, g, b]);
+async function getMaterialX() {
+  return await new MaterialXLoader()
+    .setPath(SAMPLE_PATH)
+    .loadAsync("standard_surface_gold.mtlx")
+    .then(({ materials }) => Object.values(materials).pop());
 }
 
 function init() {
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera();
+  camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    1,
+    1000
+  );
   clock = new THREE.Clock();
 
-  scene.background = new THREE.Color(0x000000);
-  scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+  scene.background = new THREE.Color(0xa0a0a0);
+  scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
 
   renderer = new THREE.WebGLRenderer({
     antialias: true,
     canvas: document.querySelector("#bg"),
   });
+  renderer.gammaInput = true;
+  renderer.gammaOutput = true;
+  renderer.shadowMap.enabled = true;
   renderer.physicallyCorrectLights = true;
+  renderer.toneMapping = THREE.LinearToneMapping;
+  renderer.toneMappingExposure = 0.5;
+  renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+
+  camera.position.set(250, 20, 20);
+
+  new RGBELoader().load("san_giuseppe_bridge_2k.hdr", async (texture) => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+
+    scene.background = texture;
+    scene.environment = texture;
+  });
 
   // controls
 
@@ -76,58 +90,114 @@ function init() {
   var angleRadians = Math.atan2(remote.y - origin.y, remote.x - origin.x);
   controls.maxPolarAngle = angleRadians;
 
-  controls.minDistance = 1;
-  controls.maxDistance = 15;
+  controls.minDistance = 155;
+  controls.maxDistance = 255;
 
   controls.maxPolarAngle = Math.PI / 2;
+
+  // GROUND
+  console.log(scene.background);
+  ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(100, 100),
+    new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false })
+  );
+  ground.name = "ground";
+  ground.position.y = -0.5;
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+
+  // scene.add(ground);
+
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+  hemiLight.position.set(0, 20, 0);
+  // scene.add(hemiLight);
+
+  function createDirectionalLight(position, intensity) {
+    const directionalLight = new THREE.DirectionalLight(0xffffff, intensity);
+    directionalLight.position.set(...position);
+    directionalLight.castShadow = true;
+    // directionalLight.shadow.camera.top = 200;
+    // directionalLight.shadow.camera.bottom = -200;
+    // directionalLight.shadow.camera.right = 200;
+    // directionalLight.shadow.camera.left = -200;
+    directionalLight.shadow.mapSize.set(4096, 4096);
+    const directionalLightHelper = new THREE.DirectionalLightHelper(
+      directionalLight
+    );
+    return [directionalLight, directionalLightHelper];
+  }
+  lights.push(
+    createDirectionalLight([0, 10, 0], 100),
+    createDirectionalLight([10, 0, 0], 100),
+    createDirectionalLight([0, 0, 10], 100)
+  );
+
+  // scene.add(...lights.flat());
+
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+  material.color = new THREE.Color(0xfedd82);
+  material.metalness = 1;
+  material.roughness = 0;
+
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(2, 1, 1);
+  //scene.add(cube);
 
   loader.load(
     // resource URL
     "./BrocktonMK2.gltf",
     // called when the resource is loaded
     function (gltf) {
-      const root = gltf.scene;
       scene.add(gltf.scene);
-
-      console.log(scene);
-      let sceneChildren = scene.children[0].children;
-      for (const key in sceneChildren) {
-        if (Object.hasOwnProperty.call(sceneChildren, key)) {
-          const sceneChild = sceneChildren[key];
-          console.log(sceneChild);
-          if (sceneChild.name === "Brockton_MK2_v4") {
-            function findEnd()
-            // const sceneChildChildren = sceneChild.children;
-            // for (const key in sceneChildChildren) {
-            //   const child = sceneChildChildren[key];
-
-            //   if (Object.hasOwnProperty.call(sceneChildChildren, key)) {
-            //     console.log(child);
-            //     //sceneChild.material.color = new THREE.Color(0xffdd82);
-            //   }
-            // }
-
-            // console.log(Brockton);
-          }
-          if (sceneChild.type === "DirectionalLight") {
-            sceneChild.intensity = 2000;
-            // console.log(element);
-            // element.target = Brockton;
-          }
-          if (sceneChild.type === "PointLight") {
-            sceneChild.intensity = 200;
-            // element.target = Brockton;
-          }
+      scene.traverse(async function (object) {
+        if (object.isMesh) {
+          object.castShadow = true;
+          //object.receiveShadow = true;
         }
-      }
+        if (object.name === "Brockton") {
+          object.scale.set(2, 2, 2);
+        }
 
-      mixer = new THREE.AnimationMixer(gltf.scene);
+        if (object.parent && object.parent.name === "Brockton") {
+          // const material = new Nodes.MeshBasicNodeMaterial({ uniforms });
+          const mat = await getMaterialX();
+          // material.clonm;
+          // mat.uniforms = uniforms;
+          // object.castShadow = true;
 
-      gltf.cameras[0].zoom = 2;
-      camera.copy(gltf.cameras[0]);
-      gltf.animations.forEach((clip) => {
-        mixer.clipAction(clip).play();
+          object.material = mat;
+          console.log(mat);
+        }
       });
+      let sceneChildren = scene.children;
+      // for (const key in sceneChildren) {
+      //   const sceneChild = sceneChildren[key];
+
+      //   if (sceneChild.name === "Dark_studio_setup") {
+      //     const studioChildren = sceneChild.children;
+      //     for (const key in studioChildren) {
+      //       if (Object.hasOwnProperty.call(studioChildren, key)) {
+      //         const studioChild = studioChildren[key];
+
+      //         if (studioChild.name === "Brockton") {
+      //           console.log(studioChild);
+      //           //camera.lookAt(sceneChild);
+      //           studioChild.castShadow = true;
+      //           studioChild.receiveShadow = true;
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+
+      // mixer = new THREE.AnimationMixer(gltf.scene);
+
+      // // camera.copy(gltf.cameras[0]);
+      // gltf.animations.forEach((clip) => {
+      //   mixer.clipAction(clip).play();
+      // });
+      console.log(scene);
     },
     // called while loading is progressing
     function (xhr) {
@@ -150,8 +220,31 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
   var delta = clock.getDelta();
-
+  ground.material.color = new THREE.Color(scene.background);
   if (mixer) mixer.update(delta);
+  nodeFrame.update();
+  // if (scene.children.length > 0) {
+  //   let sceneChildren = scene.children[0].children;
+
+  //   for (const key in sceneChildren) {
+  //     if (Object.hasOwnProperty.call(sceneChildren, key)) {
+  //       const sceneChild = sceneChildren[key];
+
+  //       if (sceneChild.name === "Brockton") {
+  //         const sceneChildChildren = sceneChild.children;
+  //         const material = sceneChildChildren[0].material;
+  //         material.emissive = new THREE.Color(scene.background);
+  //         material.emissiveIntensity = 0.3;
+  //         for (const key in sceneChildChildren) {
+  //           const child = sceneChildChildren[key];
+  //           if (Object.hasOwnProperty.call(sceneChildChildren, key)) {
+  //             child.material = material;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   renderer.render(scene, camera);
 }
