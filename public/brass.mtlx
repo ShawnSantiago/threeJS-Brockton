@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<materialx version="1.38" colorspace="lin_rec709">
+  <standard_surface name="SR_Brass" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.887, 0.789, 0.434" />
+    <input name="specular_color" type="color3" value="0.988, 0.976, 0.843" />
+    <input name="specular_roughness" type="float" value="0" />
+    <input name="specular_IOR" type="float" value="1.5" />
+    <input name="metalness" type="float" value="1" />
+    <input name="transmission" type="float" value="0" />
+    <input name="transmission_color" type="color3" value="0.887, 0.789, 0.434" />
+    <input name="transmission_dispersion" type="float" value="0" />
+  </standard_surface>
+  <surfacematerial name="Brass" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Brass" />
+  </surfacematerial>
+</materialx>
