@@ -2,6 +2,8 @@ import * as THREE from "three";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+
+import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { FontLoader } from "three/addons/loaders/FontLoader.js";
 
 import {
@@ -40,10 +42,15 @@ export const init = () => {
   fontLoader = new FontLoader(manager);
 
   //Loaders
-  new RGBELoader(manager).load("studio.hdr", async (texture) => {
-    texture.mapping = THREE.EquirectangularReflectionMapping;
+  // new RGBELoader(manager).load("bridge.hdr", async (texture) => {
+  //   texture.mapping = THREE.EquirectangularReflectionMapping;
 
-    // scene.background = texture;
+  //   // scene.background = texture;
+  //   scene.environment = texture;
+  // });
+
+  new EXRLoader().load("outdoors.exr", function (texture, textureData) {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
   });
 
@@ -115,9 +122,10 @@ export const init = () => {
 
     //Lights
     lights.push(
-      createLight([0, 10, 0], 5, "directional"),
-      createLight([10, 0, 0], 5, "directional"),
-      createLight([0, 0, 10], 5, "directional")
+      createLight([0, 20, 0], 1, "directional", false, brockton),
+      createLight([20, 0, 0], 1, "directional", false, brockton),
+      createLight([0, 0, 20], 1, "directional", false, brockton)
+      // createLight([0, 10, 0], 50000, "ambient", true)
     );
 
     scene.add(...lights.flat());
@@ -186,9 +194,6 @@ export const init = () => {
         }
       }
     }
-    // document.addEventListener("mousedown", mousedown);
-    // document.addEventListener("mousemove", mousemove);
-    // document.addEventListener("mouseup", mouseup);
 
     document.addEventListener("pointerdown", onPointerDown);
     window.addEventListener(
