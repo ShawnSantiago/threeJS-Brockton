@@ -33,13 +33,14 @@ export const init = () => {
     brockton,
     container = document.getElementById("bg");
 
+  container.style.touchAction = "none";
   // Instantiate a loader
   manager = new THREE.LoadingManager();
   loader = new GLTFLoader(manager);
   fontLoader = new FontLoader(manager);
 
   //Loaders
-  new RGBELoader(manager).load("bridge.hdr", async (texture) => {
+  new RGBELoader(manager).load("studio.hdr", async (texture) => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
 
     // scene.background = texture;
@@ -103,7 +104,7 @@ export const init = () => {
 
     //Camera
     camera = cameraUtils;
-
+    camera.lookAt(0.25, 0, 0);
     //Controls
     // controls = controlsUtils;
 
@@ -132,13 +133,59 @@ export const init = () => {
     cube.position.set(0, 0, 0);
     // scene.add(cube);
 
-    // camera.lookAt(brockton);
-    camera.lookAt(0, 0, 0);
-    console.log(camera);
     // EVENTS
-
-    container.style.touchAction = "none";
-
+    document.querySelectorAll(".background .btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        switch (e.target.classList[0]) {
+          case "green":
+            console.log(ground);
+            ground.material.color = new THREE.Color(0x16a085);
+            break;
+          case "red":
+            console.log(ground);
+            ground.material.color = new THREE.Color(0xc0392b);
+            break;
+          case "black":
+            console.log(ground);
+            ground.material.color = new THREE.Color(0x2c3e50);
+            break;
+          case "blue":
+            console.log(ground);
+            ground.material.color = new THREE.Color(0x2980b9);
+            break;
+          case "green":
+            console.log(ground);
+            ground.material.color = new THREE.Color(0x16a085);
+            break;
+          default:
+            break;
+        }
+      });
+    });
+    const brocktonColor = brockton.children[0].material.color;
+    document.querySelectorAll(".brockton-btn-container .btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        switch (e.target.classList[0]) {
+          case "brass":
+            changeColor(brockton, brocktonColor);
+            break;
+          case "silver":
+            changeColor(brockton, 0xc0c0c0);
+            break;
+          default:
+            break;
+        }
+      });
+    });
+    function changeColor(object, color) {
+      const children = object.children;
+      for (const key in children) {
+        if (Object.hasOwnProperty.call(children, key)) {
+          const element = children[key];
+          element.material.color = new THREE.Color(color);
+        }
+      }
+    }
     // document.addEventListener("mousedown", mousedown);
     // document.addEventListener("mousemove", mousemove);
     // document.addEventListener("mouseup", mouseup);
@@ -158,15 +205,17 @@ export const init = () => {
         brockton.rotation.y += (targetRotationX - brockton.rotation.y) * 0.05;
         brockton.rotation.x += (targetRotationY - brockton.rotation.x) * 0.05;
       }
-      //
-      //   if (mixer) mixer.update(delta);
-      // }
+      if (!isMoving) {
+        if (mixer) mixer.update(delta);
+      }
 
       renderer.render(scene, camera);
     };
     /* */
 
     function onPointerDown(event) {
+      console.log(event);
+      if (!event.target.classList.contains("container")) return;
       if (event.isPrimary === false) return;
       isMoving = true;
 

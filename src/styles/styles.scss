@@ -1,8 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500;900&display=swap");
 
+:root {
+  --main-black-color: #262626;
+}
+
 body {
   font-family: "Raleway", sans-serif;
   padding: 25px 50px;
+  * {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+  }
 }
 
 .container {
@@ -10,7 +23,6 @@ body {
   width: 100%;
   height: 90vh;
   justify-content: space-between;
-
   > .title {
     margin-left: 10px;
     > h1 {
@@ -20,22 +32,61 @@ body {
   }
   > .controlPanel {
     flex-direction: column;
-    width: 300px;
+    width: 250px;
     height: auto;
     display: flex;
     padding: 25px;
-    border: 1px solid $flat-black;
+    border: 1px solid var(--main-black-color);
 
     .title {
       text-align: center;
     }
-    .background-btn {
+    .btn {
+      background: none;
+      border: 1px solid var(--main-black-color);
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      &:hover {
+        color: black;
+      }
+    }
+    .background-btn-container {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
-      > button {
-        background: none;
-        border: 1px solid $flat-black;
-        border-radius: 5px;
+      .btn {
+        &.green {
+          background-color: #16a085;
+        }
+        &.red {
+          background-color: #c0392b;
+        }
+        &.black {
+          background-color: #2c3e50;
+        }
+        &.blue {
+          background-color: #2980b9;
+        }
+        &.party {
+          background: linear-gradient(
+            90deg,
+            rgba(22, 160, 133, 1) 0%,
+            rgba(192, 57, 43, 1) 41%,
+            rgba(44, 62, 80, 1) 75%,
+            rgba(41, 128, 185, 1) 100%
+          );
+        }
+      }
+    }
+    .brockton-color-container {
+      .btn {
+        &.brass {
+          background-color: #e1c16e;
+        }
+        &.silver {
+          background-color: #c0c0c0;
+        }
       }
     }
   }
