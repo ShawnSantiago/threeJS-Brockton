@@ -23,16 +23,17 @@ body {
 }
 
 .progress {
+  display: block;
   transition: width 0.25s;
   background: $green;
   color: #fff;
   padding: $bar-size;
-  width: 0;
+  width: 0%;
 }
 
 .progress-bar {
   left: 50%;
-  max-width: 50%;
+  max-width: 200px;
   position: absolute;
   top: 50%;
   transform: translate3d(-50%, -50%, 0);

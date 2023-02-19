@@ -36,6 +36,7 @@ export const init = () => {
     clock = new THREE.Clock(),
     brockton,
     container = document.getElementById("bg"),
+    progressBarContainer = document.querySelector(".progress-bar"),
     progressBar = document.querySelector(".progress");
 
   container.style.touchAction = "none";
@@ -86,7 +87,11 @@ export const init = () => {
     progressBar.style.width = percentage + "%";
     if (percentage === 100) {
       gsap.to("#bg,.container", { opacity: 1, duration: 1 });
-      gsap.to(".progress", { opacity: 0, display: "none", duration: 1 });
+      gsap.to(progressBarContainer, {
+        opacity: 0,
+        display: "none",
+        duration: 1,
+      });
     }
   };
   manager.onLoad = function () {
