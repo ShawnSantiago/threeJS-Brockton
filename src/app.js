@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import gsap from "gsap";
+
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
@@ -33,7 +35,8 @@ export const init = () => {
     scene = new THREE.Scene(),
     clock = new THREE.Clock(),
     brockton,
-    container = document.getElementById("bg");
+    container = document.getElementById("bg"),
+    progressBar = document.querySelector(".progress");
 
   container.style.touchAction = "none";
   // Instantiate a loader
@@ -78,7 +81,14 @@ export const init = () => {
       mixer = handleAnimations(gltf);
     }
   );
-
+  manager.onProgress = function (item, loaded, total) {
+    const percentage = (loaded / total) * 100;
+    progressBar.style.width = percentage + "%";
+    if (percentage === 100) {
+      gsap.to("#bg,.container", { opacity: 1, duration: 1 });
+      gsap.to(".progress", { opacity: 0, display: "none", duration: 1 });
+    }
+  };
   manager.onLoad = function () {
     console.log("Loading complete!");
 

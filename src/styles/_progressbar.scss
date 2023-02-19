@@ -1,0 +1,39 @@
+$green: #75b800;
+$gray-light: #eef1f3;
+
+$bar-size: 5px;
+$bar-radius: 60px;
+$bar-bg: rgba(0, 0, 0, 0.075);
+
+body {
+  background: $gray-light;
+}
+
+.progress-bar {
+  border-radius: $bar-radius;
+  overflow: hidden;
+  width: 100%;
+  > span {
+    display: block;
+  }
+}
+
+.bar {
+  background: $bar-bg;
+}
+
+.progress {
+  transition: width 0.25s;
+  background: $green;
+  color: #fff;
+  padding: $bar-size;
+  width: 0;
+}
+
+.progress-bar {
+  left: 50%;
+  max-width: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
+}

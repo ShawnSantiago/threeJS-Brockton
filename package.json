@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "gsap": "^3.11.4",
     "postcss": "^8.4.21",
     "postcss-nesting": "^11.2.1",
     "sass": "^1.58.3",
