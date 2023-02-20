@@ -46,7 +46,6 @@ export const init = () => {
   // Instantiate a loader
   manager = new THREE.LoadingManager();
   loader = new GLTFLoader(manager);
-  // fontLoader = new FontLoader(manager);
 
   //Loaders
   // new RGBELoader(manager).load("bridge.hdr", async (texture) => {
@@ -55,16 +54,10 @@ export const init = () => {
   //   scene.environment = texture;
   // });
 
-  fontLoader = new FontLoader(manager);
   new EXRLoader().load("outdoors.exr", function (texture, textureData) {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
   });
-
-  // fontLoader.load(
-  //   "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/fonts/helvetiker_bold.typeface.json",
-  //   (tex) => scene.add(createFont(tex))
-  // );
 
   loader.load(
     // resource URL
@@ -103,7 +96,6 @@ export const init = () => {
       }, 250);
     }
   };
-
   manager.onLoad = function () {
     console.log("Loading complete!");
 
@@ -231,7 +223,54 @@ export const init = () => {
         }
       }
     }
-
+    document.querySelectorAll(".brockton-parts-container .btn").forEach((btn) =>
+      btn.addEventListener("click", (e) => {
+        const className = e.target.classList[0];
+        focusOnPart(className, brockton);
+      })
+    );
+    function focusOnPart(className, brockton) {
+      const name = className;
+      const children = brockton.children;
+      console.log(name);
+      if (name === "reset") {
+        for (const key in children) {
+          if (Object.hasOwnProperty.call(children, key)) {
+            const child = children[key];
+            child.visible = true;
+            isMoving = false;
+          }
+        }
+      } else {
+        const part = brockton.children.filter((obj) => {
+          return obj.name.toLowerCase() === name;
+        })[0];
+        // brockton.position.set(0, -0.1, 0);
+        // gsap.to(brockton.rotation, 1, { z: -1 });
+        isMoving = true;
+        // gsap.to(part.position, 1, { y: 40 });
+        for (const key in children) {
+          if (Object.hasOwnProperty.call(children, key)) {
+            const child = children[key];
+            if (child.name.toLowerCase() !== part.name.toLowerCase()) {
+              child.visible = false;
+            } else {
+              child.visible = true;
+            }
+          }
+        }
+      }
+    }
+    document.addEventListener("mousewheel", (event) => {
+      var fovMAX = 3;
+      var fovMIN = 1.5;
+      console.log(event);
+      if (camera.position.z > fovMIN && event.deltaY < 0) {
+        camera.position.z += event.deltaY / 500;
+      } else if (camera.position.z < fovMAX && event.deltaY > 0) {
+        camera.position.z += event.deltaY / 500;
+      }
+    });
     document.addEventListener("pointerdown", onPointerDown);
     window.addEventListener(
       "resize",
@@ -242,7 +281,6 @@ export const init = () => {
     const animate = () => {
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
-      // console.log(brockton.rotation);
       if (brockton) {
         brockton.rotation.y += (targetRotationX - brockton.rotation.y) * 0.05;
         brockton.rotation.x += (targetRotationY - brockton.rotation.x) * 0.05;
@@ -256,8 +294,12 @@ export const init = () => {
     /* */
 
     function onPointerDown(event) {
-      console.log(event);
-      if (!event.target.classList.contains("container")) return;
+      console.log(event.target.closest(".controlPanel"));
+      if (
+        event.target.classList.contains("controlPanel") ||
+        event.target.closest(".controlPanel")
+      )
+        return;
       if (event.isPrimary === false) return;
       isMoving = true;
 
