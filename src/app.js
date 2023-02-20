@@ -89,14 +89,17 @@ export const init = () => {
     const percentage = (loaded / total) * 100;
     progressBar.style.width = percentage + "%";
     if (percentage === 100) {
-      gsap.to(progressBarContainer, {
-        opacity: 0,
-        display: "none",
-        duration: 1,
-      });
-      gsap.to("#bg,.container", { opacity: 1, duration: 1 });
+      setTimeout(() => {
+        gsap.to(progressBarContainer, {
+          opacity: 0,
+          display: "none",
+          duration: 1,
+        });
+        gsap.to("#bg,.container", { opacity: 1, duration: 1 });
+      }, 250);
     }
   };
+
   manager.onLoad = function () {
     console.log("Loading complete!");
 
@@ -177,23 +180,25 @@ export const init = () => {
           blue: new THREE.Color(0x2980b9),
         };
         const color = e.target.classList[0];
-        if (color !== "party")
+        if (color !== "party") {
           gsap.to(ground.material.color, {
             duration: 1,
             r: c[color].r,
             g: c[color].g,
             b: c[color].b,
           });
-        const tl = gsap.timeline({ repeat: 2 });
-        for (const key in c) {
-          if (Object.hasOwnProperty.call(c, key)) {
-            const color = c[key];
-            tl.to(ground.material.color, {
-              duration: 0.5,
-              r: color.r,
-              g: color.g,
-              b: color.b,
-            });
+        } else {
+          const tl = gsap.timeline({ repeat: 2 });
+          for (const key in c) {
+            if (Object.hasOwnProperty.call(c, key)) {
+              const color = c[key];
+              tl.to(ground.material.color, {
+                duration: 0.5,
+                r: color.r,
+                g: color.g,
+                b: color.b,
+              });
+            }
           }
         }
       });

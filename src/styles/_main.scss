@@ -9,7 +9,8 @@
 body {
   position: relative;
   font-family: "AL LePorsche", sans-serif;
-  padding: 25px 50px;
+  margin: 0;
+
   * {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -27,9 +28,9 @@ body {
 }
 .container {
   display: flex;
-  width: 100%;
   height: 90vh;
   justify-content: space-between;
+  padding: 25px 50px;
   > .title {
     margin-left: 10px;
     > h1 {
