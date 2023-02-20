@@ -43,7 +43,7 @@ export const init = () => {
   // Instantiate a loader
   manager = new THREE.LoadingManager();
   loader = new GLTFLoader(manager);
-  fontLoader = new FontLoader(manager);
+  // fontLoader = new FontLoader(manager);
 
   //Loaders
   // new RGBELoader(manager).load("bridge.hdr", async (texture) => {
@@ -53,6 +53,7 @@ export const init = () => {
   //   scene.environment = texture;
   // });
 
+  fontLoader = new FontLoader(manager);
   new EXRLoader().load("outdoors.exr", function (texture, textureData) {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
@@ -73,9 +74,11 @@ export const init = () => {
         let mesh = object;
         if (mesh.name === "Brockton") {
           brockton = mesh;
+          mesh.castShadow = true;
         }
         if (mesh.isMesh) {
           if (mesh.parent && object.parent.name === "Brockton") {
+            mesh.castShadow = true;
           }
         }
       });
@@ -86,12 +89,12 @@ export const init = () => {
     const percentage = (loaded / total) * 100;
     progressBar.style.width = percentage + "%";
     if (percentage === 100) {
-      gsap.to("#bg,.container", { opacity: 1, duration: 1 });
       gsap.to(progressBarContainer, {
         opacity: 0,
         display: "none",
         duration: 1,
       });
+      gsap.to("#bg,.container", { opacity: 1, duration: 1 });
     }
   };
   manager.onLoad = function () {
@@ -140,48 +143,58 @@ export const init = () => {
       createLight([0, 20, 0], 1, "directional", false, brockton),
       createLight([20, 0, 0], 1, "directional", false, brockton),
       createLight([0, 0, 20], 1, "directional", false, brockton)
-      // createLight([0, 10, 0], 50000, "ambient", true)
+      // createLight([0, 10, 0], 5, "ambient", true)
     );
+    // console.log(lights[0][0]);
+    // const helper = new THREE.CameraHelper(lights[0][0].shadow.camera);
+    // scene.add(helper);
 
     scene.add(...lights.flat());
 
     //Other Objects
-    const geometry = new THREE.BoxGeometry(2, 2, 2);
-    const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-    material.color = new THREE.Color(0xfedd82);
-    material.metalness = 1;
-    material.roughness = 0;
+    const geometry = new THREE.BoxGeometry(1.25, 1, 1.25);
+    const material = new THREE.MeshPhongMaterial({ color: 0xe1c16e });
+    // material.color = new THREE.Color(0xa0a0a0);
 
     const cube = new THREE.Mesh(geometry, material);
-    cube.position.set(0, 0, 0);
-    // scene.add(cube);
+    cube.receiveShadow = true;
+    cube.position.set(0, -1.5, 0);
+    cube.rotation.set(0, 0, 0);
+    scene.add(cube);
+
+    gsap.from(brockton.position, { duration: 2, y: 0.5 });
+
+    gsap.to(cube.position, { duration: 2, y: -0.9 });
+    gsap.to(cube.rotation, { duration: 2, y: -0.75 });
 
     // EVENTS
     document.querySelectorAll(".background .btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        switch (e.target.classList[0]) {
-          case "green":
-            console.log(ground);
-            ground.material.color = new THREE.Color(0x16a085);
-            break;
-          case "red":
-            console.log(ground);
-            ground.material.color = new THREE.Color(0xc0392b);
-            break;
-          case "black":
-            console.log(ground);
-            ground.material.color = new THREE.Color(0x2c3e50);
-            break;
-          case "blue":
-            console.log(ground);
-            ground.material.color = new THREE.Color(0x2980b9);
-            break;
-          case "green":
-            console.log(ground);
-            ground.material.color = new THREE.Color(0x16a085);
-            break;
-          default:
-            break;
+        const c = {
+          green: new THREE.Color(0x16a085),
+          red: new THREE.Color(0xc0392b),
+          black: new THREE.Color(0x2c3e50),
+          blue: new THREE.Color(0x2980b9),
+        };
+        const color = e.target.classList[0];
+        if (color !== "party")
+          gsap.to(ground.material.color, {
+            duration: 1,
+            r: c[color].r,
+            g: c[color].g,
+            b: c[color].b,
+          });
+        const tl = gsap.timeline({ repeat: 2 });
+        for (const key in c) {
+          if (Object.hasOwnProperty.call(c, key)) {
+            const color = c[key];
+            tl.to(ground.material.color, {
+              duration: 0.5,
+              r: color.r,
+              g: color.g,
+              b: color.b,
+            });
+          }
         }
       });
     });

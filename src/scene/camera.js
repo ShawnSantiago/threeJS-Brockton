@@ -7,6 +7,6 @@ const cameraUtils = new PerspectiveCamera(
   1000
 );
 
-cameraUtils.position.set(0, 0, 2);
+cameraUtils.position.set(0, 0, 3);
 
 export default cameraUtils;

@@ -3,6 +3,7 @@ import {
   VSMShadowMap,
   LinearToneMapping,
   sRGBEncoding,
+  PCFSoftShadowMap,
 } from "three";
 
 const rendererUtils = new WebGLRenderer({
@@ -11,8 +12,9 @@ const rendererUtils = new WebGLRenderer({
 });
 // rendererUtils.gammaInput = true;
 // rendererUtils.gammaOutput = true;
-// rendererUtils.shadowMap.enabled = true;
-// rendererUtils.shadowMap.type = VSMShadowMap;
+rendererUtils.shadowMap.enabled = true;
+rendererUtils.shadowMap.type = PCFSoftShadowMap;
+//  rendererUtils.shadowMap.type = VSMShadowMap;
 // rendererUtils.physicallyCorrectLights = true;
 // rendererUtils.toneMapping = LinearToneMapping;
 // rendererUtils.toneMappingExposure = 0.5;

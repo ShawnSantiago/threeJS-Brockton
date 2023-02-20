@@ -18,9 +18,10 @@ const createLight = (
   const directionalLight = new DirectionalLight(0xffffff, intensity);
   directionalLight.position.set(...position);
   directionalLight.castShadow = true;
+  directionalLight.shadow.camera.near = 0;
   directionalLight.shadow.mapSize.set(4096, 4096);
-  directionalLight.shadow.blurSamples = 25;
-  directionalLight.target = targetObject;
+  if (targetObject) directionalLight.target = targetObject;
+
   const directionalLightHelper = new DirectionalLightHelper(
     directionalLight,
     5,

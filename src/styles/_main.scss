@@ -1,12 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500;900&display=swap");
-
+@font-face {
+  font-family: "AL LePorsche";
+  src: url("./AL_LePORSCHE.ttf");
+}
 :root {
   --main-black-color: #262626;
 }
 
 body {
   position: relative;
-  font-family: "Raleway", sans-serif;
+  font-family: "AL LePorsche", sans-serif;
   padding: 25px 50px;
   * {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -41,7 +43,7 @@ body {
     height: auto;
     display: flex;
     padding: 25px;
-    border: 1px solid var(--main-black-color);
+    justify-content: end;
 
     .title {
       text-align: center;
