@@ -8,7 +8,8 @@ setTimeout(() => {
     )
   ) {
     // true for mobile device
-    document.alert("Sorry not optomized for mobile devices");
+    document.querySelector(".progress-bar").innerHTML =
+      "Sorry not optomized for mobile devices";
   } else {
     // false for not mobile device
     init();
