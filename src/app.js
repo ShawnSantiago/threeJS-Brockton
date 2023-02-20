@@ -35,6 +35,9 @@ export const init = () => {
     scene = new THREE.Scene(),
     clock = new THREE.Clock(),
     brockton,
+    brocktonCurrentRotX,
+    brocktonCurrentRotY,
+    brocktonCurrentRotZ,
     container = document.getElementById("bg"),
     progressBarContainer = document.querySelector(".progress-bar"),
     progressBar = document.querySelector(".progress");
@@ -75,10 +78,12 @@ export const init = () => {
         if (mesh.name === "Brockton") {
           brockton = mesh;
           mesh.castShadow = true;
+          mesh.recieveShadow = false;
         }
         if (mesh.isMesh) {
           if (mesh.parent && object.parent.name === "Brockton") {
             mesh.castShadow = true;
+            mesh.recieveShadow = false;
           }
         }
       });
@@ -238,7 +243,7 @@ export const init = () => {
     const animate = () => {
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
-
+      // console.log(brockton.rotation);
       if (brockton) {
         brockton.rotation.y += (targetRotationX - brockton.rotation.y) * 0.05;
         brockton.rotation.x += (targetRotationY - brockton.rotation.x) * 0.05;
@@ -257,6 +262,10 @@ export const init = () => {
       if (event.isPrimary === false) return;
       isMoving = true;
 
+      brocktonCurrentRotX = brockton.rotation.x;
+      brocktonCurrentRotY = brockton.rotation.y;
+      brocktonCurrentRotZ = brockton.rotation.z;
+
       pointerXOnPointerDown = event.clientX - windowHalfX;
       pointerYOnPointerDown = event.clientY - windowHalfY;
 
@@ -272,21 +281,25 @@ export const init = () => {
       pointerX = event.clientX - windowHalfX;
       pointerY = event.clientY - windowHalfY;
 
-      targetRotationX =
-        targetRotationXOnPointerDown +
-        (pointerX - pointerXOnPointerDown) * 0.02;
+      targetRotationX = (pointerX - pointerXOnPointerDown) * 0.02;
 
-      targetRotationY =
-        targetRotationYOnPointerDown +
-        (pointerY - pointerYOnPointerDown) * 0.02;
+      targetRotationY = (pointerY - pointerYOnPointerDown) * 0.02;
     }
 
     function onPointerUp() {
       if (event.isPrimary === false) return;
-      isMoving = false;
 
-      document.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("pointerup", onPointerUp);
+      gsap.to(brockton.rotation, {
+        duration: 0.5,
+        x: brocktonCurrentRotX,
+        y: brocktonCurrentRotY,
+        z: brocktonCurrentRotZ,
+        onComplete: () => {
+          isMoving = false;
+          document.removeEventListener("pointermove", onPointerMove);
+          document.removeEventListener("pointerup", onPointerUp);
+        },
+      });
     }
     animate();
   };
