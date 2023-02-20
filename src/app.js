@@ -51,7 +51,6 @@ export const init = () => {
   //Loaders
   // new RGBELoader(manager).load("bridge.hdr", async (texture) => {
   //   texture.mapping = THREE.EquirectangularReflectionMapping;
-
   //   // scene.background = texture;
   //   scene.environment = texture;
   // });
