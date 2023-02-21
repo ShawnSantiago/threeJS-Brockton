@@ -40,7 +40,8 @@ export const init = () => {
     brocktonCurrentRotZ,
     container = document.getElementById("bg"),
     progressBarContainer = document.querySelector(".progress-bar"),
-    progressBar = document.querySelector(".progress");
+    progressBar = document.querySelector(".progress"),
+    tl = gsap.timeline();
 
   container.style.touchAction = "none";
   // Instantiate a loader
@@ -86,21 +87,19 @@ export const init = () => {
     const percentage = (loaded / total) * 100;
     progressBar.style.width = percentage + "%";
     if (percentage === 100) {
-      setTimeout(() => {
-        gsap.to(progressBarContainer, {
-          opacity: 0,
-          display: "none",
-          duration: 1,
-        });
-        gsap.to("#bg,.container", { opacity: 1, duration: 1 });
-      }, 250);
+      tl.to(progressBarContainer, {
+        opacity: 0,
+        display: "none",
+        duration: 1,
+      });
+      tl.to("#bg,.container", { opacity: 1, duration: 1 });
     }
   };
   manager.onLoad = function () {
     console.log("Loading complete!");
 
     //Scene
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = new THREE.Color(0xf9f9f9);
     scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
 
     //Brockton
@@ -160,16 +159,17 @@ export const init = () => {
     cube.position.set(0, -1.5, 0);
     cube.rotation.set(0, 0, 0);
     scene.add(cube);
+    tl.add("start", ">-1");
+    tl.from(brockton.position, { duration: 2, y: 0.5 }, "start");
 
-    gsap.from(brockton.position, { duration: 2, y: 0.5 });
-
-    gsap.to(cube.position, { duration: 2, y: -0.9 });
-    gsap.to(cube.rotation, { duration: 2, y: -0.75 });
+    tl.to(cube.position, { duration: 2, y: -0.9 }, "start");
+    tl.to(cube.rotation, { duration: 2, y: -0.75 }, "start");
 
     // EVENTS
     document.querySelectorAll(".background .btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const c = {
+          white: new THREE.Color(0xf9f9f9),
           green: new THREE.Color(0x16a085),
           red: new THREE.Color(0xc0392b),
           black: new THREE.Color(0x2c3e50),
