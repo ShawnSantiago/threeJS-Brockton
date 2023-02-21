@@ -1,23 +1,12 @@
-import { AnimationMixer } from "three";
-import { getMaterialX } from "../utils";
-export const handleGLTF = async (object) => {
-  let mesh = object;
-  if (mesh.isMesh) {
-    if (mesh.name === "Brockton") {
-      //object.scale.set(2, 2, 2);
-    }
-    if (mesh.parent && object.parent.name === "Brockton") {
-      const mat = await getMaterialX();
-      object.material = mat;
-    }
-  }
-  return mesh;
-};
-export const handleAnimations = (gltf) => {
-  const mixer = new AnimationMixer(gltf.scene);
+import * as THREE from "three";
 
-  gltf.animations.forEach((clip) => {
-    mixer.clipAction(clip).play();
-  });
-  return mixer;
-};
+const cube = new THREE.Mesh(
+  new THREE.BoxGeometry(1.25, 1, 1.25),
+  new THREE.MeshPhongMaterial({ color: 0xe1c16e })
+);
+
+cube.receiveShadow = true;
+cube.position.set(0, -1.5, 0);
+cube.rotation.set(0, 0, 0);
+
+export { cube };

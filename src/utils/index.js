@@ -1,14 +1,6 @@
-import { MaterialXLoader } from "three/examples/jsm/loaders/MaterialXLoader";
-export const getMaterialX = async () => {
-  return await new MaterialXLoader()
-    .loadAsync("brass.mtlx")
-    .then(({ materials }) => Object.values(materials).pop());
-};
+import * as event from "./events";
+import * as helpers from "./helpers";
 
-export const onWindowResize = (window, camera, renderer) => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+const utils = { ...event, ...helpers };
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  return [camera, renderer];
-};
+export default utils;

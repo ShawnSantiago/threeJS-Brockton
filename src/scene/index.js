@@ -4,7 +4,7 @@ import controlsUtils from "./cameraControls";
 import groundUtil from "./ground";
 import createLight from "./lights";
 import createFont from "./text";
-import { handleGLTF, handleAnimations } from "./obj";
+import { cube } from "./obj";
 
 export {
   rendererUtils,
@@ -13,6 +13,5 @@ export {
   groundUtil,
   createLight,
   createFont,
-  handleGLTF,
-  handleAnimations,
+  cube,
 };
