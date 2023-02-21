@@ -173,6 +173,7 @@ export const init = () => {
 
     tl.to(cube.position, { duration: 2, y: -0.9 }, "start");
     tl.to(cube.rotation, { duration: 2, y: -0.75 }, "start");
+    tl.to(".sector", { opacity: 1, duration: 1 });
 
     // EVENTS
     document.querySelectorAll(".background .btn").forEach((btn) => {
