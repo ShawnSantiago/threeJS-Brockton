@@ -28,9 +28,8 @@ export const init = () => {
     mixer,
     lights = [],
     ground,
-    loader,
-    fontLoader,
     manager,
+    fontLoaded,
     isMoving,
     scene = new THREE.Scene(),
     clock = new THREE.Clock(),
@@ -46,7 +45,6 @@ export const init = () => {
   container.style.touchAction = "none";
   // Instantiate a loader
   manager = new THREE.LoadingManager();
-  loader = new GLTFLoader(manager);
 
   //Loaders
   // new RGBELoader(manager).load("bridge.hdr", async (texture) => {
@@ -55,12 +53,23 @@ export const init = () => {
   //   scene.environment = texture;
   // });
 
-  new EXRLoader().load("outdoors.exr", function (texture, textureData) {
+  new FontLoader(manager).load(
+    // resource URL
+    "AL_LePORSCHE.json",
+
+    // onLoad callback
+    function (font) {
+      // do something with the font
+      fontLoaded = font;
+    }
+  );
+
+  new EXRLoader(manager).load("outdoors.exr", function (texture, textureData) {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
   });
 
-  loader.load(
+  new GLTFLoader(manager).load(
     // resource URL
     "./BrocktonMK2.gltf",
     // called when the resource is loaded
@@ -150,11 +159,11 @@ export const init = () => {
     scene.add(...lights.flat());
 
     //Other Objects
-    const geometry = new THREE.BoxGeometry(1.25, 1, 1.25);
-    const material = new THREE.MeshPhongMaterial({ color: 0xe1c16e });
-    // material.color = new THREE.Color(0xa0a0a0);
 
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(
+      new THREE.BoxGeometry(1.25, 1, 1.25),
+      new THREE.MeshPhongMaterial({ color: 0xe1c16e })
+    );
     cube.receiveShadow = true;
     cube.position.set(0, -1.5, 0);
     cube.rotation.set(0, 0, 0);
@@ -172,10 +181,11 @@ export const init = () => {
           white: new THREE.Color(0xf9f9f9),
           green: new THREE.Color(0x16a085),
           red: new THREE.Color(0xc0392b),
-          black: new THREE.Color(0x2c3e50),
+          black: new THREE.Color(0x0d0d0d),
           blue: new THREE.Color(0x2980b9),
         };
         const color = e.target.classList[0];
+
         if (color !== "party") {
           gsap.to(ground.material.color, {
             duration: 1,
@@ -183,6 +193,11 @@ export const init = () => {
             g: c[color].g,
             b: c[color].b,
           });
+          if (color === "black") {
+            gsap.to("h2,h3,button,p", { duration: 0.5, color: "#ffffff" });
+          } else {
+            gsap.to("h2,h3,button,p", { duration: 0.5, color: "#000000" });
+          }
         } else {
           const tl = gsap.timeline({ repeat: 2 });
           for (const key in c) {
@@ -232,7 +247,6 @@ export const init = () => {
     function focusOnPart(className, brockton) {
       const name = className;
       const children = brockton.children;
-      console.log(name);
       if (name === "reset") {
         for (const key in children) {
           if (Object.hasOwnProperty.call(children, key)) {
@@ -245,8 +259,8 @@ export const init = () => {
         const part = brockton.children.filter((obj) => {
           return obj.name.toLowerCase() === name;
         })[0];
-        // brockton.position.set(0, -0.1, 0);
-        // gsap.to(brockton.rotation, 1, { z: -1 });
+        brockton.position.set(0, -0.1, 0);
+        gsap.to(brockton.rotation, 1, { z: -1 });
         isMoving = true;
         // gsap.to(part.position, 1, { y: 40 });
         for (const key in children) {
@@ -264,7 +278,6 @@ export const init = () => {
     document.addEventListener("mousewheel", (event) => {
       var fovMAX = 3;
       var fovMIN = 1.5;
-      console.log(event);
       if (camera.position.z > fovMIN && event.deltaY < 0) {
         camera.position.z += event.deltaY / 500;
       } else if (camera.position.z < fovMAX && event.deltaY > 0) {
@@ -294,7 +307,6 @@ export const init = () => {
     /* */
 
     function onPointerDown(event) {
-      console.log(event.target.closest(".controlPanel"));
       if (
         event.target.classList.contains("controlPanel") ||
         event.target.closest(".controlPanel")
