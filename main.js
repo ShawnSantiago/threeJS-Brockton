@@ -2,6 +2,7 @@ import { init } from "./src/app";
 import "./styles.scss";
 
 setTimeout(() => {
+  document.querySelector("body").style.opacity = 1;
   if (
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
