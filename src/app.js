@@ -1,7 +1,5 @@
 import * as THREE from "three";
 
-import gsap from "gsap";
-
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
@@ -16,6 +14,7 @@ import {
   createLight,
   createFont,
   objects,
+  animations,
 } from "./scene";
 
 import utils from "./utils";
@@ -23,9 +22,7 @@ import utils from "./utils";
 import { state } from "./state";
 
 let container = document.getElementById("bg"),
-  progressBarContainer = document.querySelector(".progress-bar"),
   progressBar = document.querySelector(".progress"),
-  tl = gsap.timeline(),
   camera,
   controls,
   renderer,
@@ -97,16 +94,13 @@ export const init = () => {
     const percentage = (loaded / total) * 100;
     progressBar.style.width = percentage + "%";
     if (percentage === 100) {
-      tl.to(progressBarContainer, {
-        opacity: 0,
-        display: "none",
-        duration: 1,
-      });
-      tl.to("#bg,.container", { opacity: 1, duration: 1 });
+      state.assetsLoaded.set(true);
     }
   };
   manager.onLoad = function () {
     console.log("Loading complete!");
+    //Animations
+    animations();
 
     let brockton = state.brockton;
     //Scene
@@ -118,6 +112,7 @@ export const init = () => {
 
     //Camera
     camera = cameraUtils;
+    console.log(camera);
     camera.lookAt(0.25, 0, 0);
 
     //Controls
@@ -143,17 +138,8 @@ export const init = () => {
     scene.add(...lights.flat());
 
     //Other Objects
-    console.log(objects);
+
     scene.add(...objects);
-
-    //Animations
-
-    tl.add("start", ">-1");
-    tl.from(brockton.value.position, { duration: 2, y: 0.5 }, "start");
-
-    tl.to(cube.position, { duration: 2, y: -0.9 }, "start");
-    tl.to(cube.rotation, { duration: 2, y: -0.75 }, "start");
-    tl.to(".sector", { opacity: 1, duration: 1 });
 
     // EVENTS
     document

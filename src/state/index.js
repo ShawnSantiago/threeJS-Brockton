@@ -14,6 +14,7 @@ const state = {
   pointerYOnPointerDown: create(0),
   backdrop: create({}),
   brocktonColor: create(),
+  assetsLoaded: create(false),
 };
 
 export { state };

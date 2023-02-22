@@ -5,6 +5,7 @@ import backdropUtil from "./backdrop";
 import createLight from "./lights";
 import createFont from "./text";
 import objects from "./obj";
+import animations from "./animations";
 
 export {
   rendererUtils,
@@ -14,4 +15,5 @@ export {
   createLight,
   createFont,
   objects,
+  animations,
 };
