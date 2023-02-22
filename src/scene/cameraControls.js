@@ -15,7 +15,7 @@ const controlsUtils = (camera, renderer) => {
   var d = centerPosition.distanceTo(groundPosition);
 
   var origin = new Vector2(control.target.y, 0);
-  var remote = new Vector2(0, d); // replace 0 with raycasted ground altitude
+  var remote = new Vector2(0, d); // replace 0 with raycasted backdrop altitude
   var angleRadians = Math.atan2(remote.y - origin.y, remote.x - origin.x);
   control.maxPolarAngle = angleRadians;
 

@@ -1,17 +1,17 @@
 import rendererUtils from "./renderer";
 import cameraUtils from "./camera";
 import controlsUtils from "./cameraControls";
-import groundUtil from "./ground";
+import backdropUtil from "./backdrop";
 import createLight from "./lights";
 import createFont from "./text";
-import { cube } from "./obj";
+import objects from "./obj";
 
 export {
   rendererUtils,
   cameraUtils,
   controlsUtils,
-  groundUtil,
+  backdropUtil,
   createLight,
   createFont,
-  cube,
+  objects,
 };

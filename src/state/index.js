@@ -8,12 +8,12 @@ const state = {
   brocktonCurrentRotZ: create(0),
   targetRotationY: create(1),
   targetRotationX: create(1),
-  targetRotationYOnPointerDown: create(0),
-  targetRotationXOnPointerDown: create(0),
   pointerX: create(0),
   pointerXOnPointerDown: create(0),
   pointerY: create(0),
   pointerYOnPointerDown: create(0),
+  backdrop: create({}),
+  brocktonColor: create(),
 };
 
 export { state };
