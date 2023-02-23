@@ -28,23 +28,19 @@ let container = document.getElementById("bg"),
   renderer,
   mixer,
   backdrop,
-  fontLoaded,
   lights = [],
   clock = new THREE.Clock(),
-  scene = new THREE.Scene(),
+  scene,
   manager = new THREE.LoadingManager();
 
 container.style.touchAction = "none";
 
 export const init = () => {
   // Instantiate a loader
+  state.scene.set(new THREE.Scene());
+  scene = state.scene.value;
 
   //Loaders
-  // new RGBELoader(manager).load("bridge.hdr", async (texture) => {
-  //   texture.mapping = THREE.EquirectangularReflectionMapping;
-  //   // scene.background = texture;
-  //   scene.environment = texture;
-  // });
 
   new FontLoader(manager).load(
     // resource URL
@@ -53,7 +49,7 @@ export const init = () => {
     // onLoad callback
     function (font) {
       // do something with the font
-      fontLoaded = font;
+      state.loadedFont.set(font);
     }
   );
 
@@ -78,6 +74,10 @@ export const init = () => {
           mesh.recieveShadow = false;
           brockton = mesh;
           state.brockton.set(brockton);
+          state.brocktonStartingPos.set(
+            new THREE.Vector3().setFromMatrixPosition(brockton.matrixWorld)
+          );
+          state.brocktonStartingRot.set(brockton.rotation);
           state.brocktonColor.set(brockton.children[0].material.color);
         }
         if (mesh.isMesh) {
@@ -102,7 +102,9 @@ export const init = () => {
     //Animations
     animations();
 
+    //Brocton
     let brockton = state.brockton;
+
     //Scene
     scene.background = new THREE.Color(0xf9f9f9);
     scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
@@ -146,6 +148,10 @@ export const init = () => {
       .querySelectorAll(".control-panel .btn")
       .forEach((btn) => btn.addEventListener("click", utils.handleButtons));
 
+    document
+      .querySelectorAll(".play-controls .btn")
+      .forEach((btn) => btn.addEventListener("click", utils.playButtons));
+
     document.addEventListener("mousewheel", (event) =>
       utils.handleMouseWheelDown(event, camera)
     );
@@ -160,15 +166,14 @@ export const init = () => {
     const animate = () => {
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
+      if (!state.isMoving.value) {
+        if (mixer) mixer.update(delta);
+      }
       if (brockton.value) {
         brockton.value.rotation.y +=
           (state.targetRotationX.value - brockton.value.rotation.y) * 0.05;
         brockton.value.rotation.x +=
           (state.targetRotationY.value - brockton.value.rotation.x) * 0.05;
-      }
-
-      if (!state.isMoving.value) {
-        if (mixer) mixer.update(delta);
       }
 
       renderer.render(scene, camera);

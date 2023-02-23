@@ -67,6 +67,9 @@ button {
     &.sector-4 {
       display: flex;
     }
+    &.sector-3 {
+      display: flex;
+    }
   }
   .icons {
     display: flex;
@@ -107,6 +110,20 @@ button {
     }
     .brockton-color-container {
       .btn {
+      }
+    }
+  }
+  .play-controls-container {
+    flex-direction: column;
+    justify-content: end;
+    .play-controls {
+      display: flex;
+      img {
+        width: 16px;
+        height: 16px;
+      }
+      .pause {
+        margin-left: 15px;
       }
     }
   }

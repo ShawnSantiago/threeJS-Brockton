@@ -1,6 +1,14 @@
-import { Color } from "three";
+import {
+  Color,
+  LineBasicMaterial,
+  Vector3,
+  BufferGeometry,
+  Line,
+  Box3,
+} from "three";
 import { state } from "../state";
 import gsap from "gsap";
+import { createFont } from "../scene";
 
 let windowHalfX = window.innerWidth / 2,
   windowHalfY = window.innerHeight / 2;
@@ -8,7 +16,9 @@ let windowHalfX = window.innerWidth / 2,
 export function onPointerDown(event) {
   if (
     event.target.classList.contains("control-panel") ||
-    event.target.closest(".control-panel")
+    event.target.closest(".control-panel") ||
+    event.target.classList.contains("play-controls") ||
+    event.target.closest(".play-controls")
   )
     return;
   if (event.isPrimary === false) return;
@@ -42,12 +52,13 @@ export function onPointerMove(event) {
 
 export function onPointerUp() {
   if (event.isPrimary === false) return;
-  state.isMoving.set(false);
   document.removeEventListener("pointermove", onPointerMove);
   document.removeEventListener("pointerup", onPointerUp);
 }
 export function handleButtons(e) {
-  if (e.target.closest(".background-btn-container")) {
+  const el = e.target,
+    className = el.classList[0];
+  if (el.closest(".background-btn-container")) {
     const c = {
       white: new Color(0xf9f9f9),
       green: new Color(0x16a085),
@@ -55,16 +66,15 @@ export function handleButtons(e) {
       black: new Color(0x0d0d0d),
       blue: new Color(0x2980b9),
     };
-    const color = e.target.classList[0];
 
-    if (color !== "party") {
+    if (className !== "party") {
       gsap.to(state.backdrop.value.material.color, {
         duration: 1,
-        r: c[color].r,
-        g: c[color].g,
-        b: c[color].b,
+        r: c[className].r,
+        g: c[className].g,
+        b: c[className].b,
       });
-      if (color === "black") {
+      if (className === "black") {
         gsap.to("h2,h3,button,p", { duration: 0.5, color: "#ffffff" });
       } else {
         gsap.to("h2,h3,button,p", { duration: 0.5, color: "#000000" });
@@ -84,8 +94,8 @@ export function handleButtons(e) {
       }
     }
   }
-  if (e.target.closest(".brockton-color-container")) {
-    switch (e.target.classList[0]) {
+  if (el.closest(".brockton-color-container")) {
+    switch (className) {
       case "brass":
         changeColor(state.brockton.value, state.brocktonColor.value);
         break;
@@ -97,9 +107,14 @@ export function handleButtons(e) {
     }
   }
 
-  if (e.target.closest(".brockton-parts-container")) {
-    const className = e.target.classList[0];
+  if (el.closest(".brockton-parts-container")) {
     focusOnPart(className, state.brockton.value);
+  }
+  if (el.closest(".brockton-modes-container")) {
+    if (className === "dimensions") {
+      console.log("help");
+      createDimensions();
+    }
   }
 }
 
@@ -111,6 +126,78 @@ export function handleMouseWheelDown(event, camera) {
   } else if (camera.position.z < fovMAX && event.deltaY > 0) {
     camera.position.z += event.deltaY / 500;
   }
+}
+
+export function playButtons(e) {
+  const el = e.target,
+    { x, y, z } = state.brocktonStartingRot.value;
+  console.log(el);
+  if (el.classList.contains("play") || el.closest(".play")) {
+    state.isMoving.set(false);
+    return;
+  }
+  state.isMoving.set(true);
+  console.log(x, y, z);
+  gsap.to(state.brockton.value.rotation, 0.25, {
+    x,
+    y,
+    z,
+  });
+  console.log(state.brockton.value.rotation);
+}
+
+function createDimensions() {
+  if (state.hasDimensions.value) {
+    return;
+  }
+  const dimensions = {
+      length: '4.34"',
+      height: '1.18"',
+      weight: "6oz",
+      diameter: '1.2"',
+    },
+    font = state.loadedFont.value,
+    length = createFont({
+      text: dimensions.length,
+      font: font,
+      position: [0, 0.25, 0],
+    }),
+    head = findPart("Head"),
+    mouthPiece = findPart("Mouthpiece"),
+    brocktonSize = new Box3().setFromObject(state.brockton.value),
+    line = new Line(
+      new BufferGeometry().setFromPoints([
+        new Vector3().setFromMatrixPosition(head.matrixWorld),
+        new Vector3().setFromMatrixPosition(mouthPiece.matrixWorld),
+      ]),
+      new LineBasicMaterial({ color: 0x000000 })
+    ),
+    { x, y, z } = state.brockton.value.rotation;
+  console.log(mouthPiece);
+  console.log(state.brockton.value);
+
+  state.isMoving.set(true);
+  line.position.y = 0.2;
+  gsap.to(state.brockton.value.rotation, 0.25, {
+    x: 0.9999999999999755,
+    y: 1.000000000000014,
+    z: -1,
+  });
+  length.attach(line);
+  state.brockton.value.attach(length);
+  state.hasDimensions.set(true);
+}
+
+function getPointInBetweenByLen(pointA, pointB) {
+  console.log(pointB.clone().position.sub(pointA.position));
+  var dir = pointB.clone().position.sub(pointA.position);
+  var len = dir.length();
+  var dir2 = pointB
+    .clone()
+    .position.sub(pointA.position)
+    .normalize()
+    .multiplyScalar(len);
+  return pointA.clone().position.add(dir2);
 }
 
 function changeColor(object, color) {
@@ -153,4 +240,8 @@ function focusOnPart(className, brockton) {
       }
     }
   }
+}
+
+function findPart(name) {
+  return state.brockton.value.children.filter((part) => part.name === name)[0];
 }

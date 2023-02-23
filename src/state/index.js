@@ -3,6 +3,8 @@ import { create } from "xoid";
 const state = {
   isMoving: create(false),
   brockton: create({}),
+  brocktonStartingPos: create(),
+  brocktonStartingRot: create(),
   brocktonCurrentRotX: create(0),
   brocktonCurrentRotY: create(0),
   brocktonCurrentRotZ: create(0),
@@ -15,6 +17,9 @@ const state = {
   backdrop: create({}),
   brocktonColor: create(),
   assetsLoaded: create(false),
+  loadedFont: create({}),
+  scene: create({}),
+  hasDimensions: create(false),
 };
 
 export { state };
